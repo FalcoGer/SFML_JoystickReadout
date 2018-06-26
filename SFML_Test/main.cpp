@@ -4,7 +4,9 @@
 using namespace std;
 
 const sf::Int64 MIN_FRAMERATE = 15;
+const sf::Int64 MAX_FRAMERATE = 120;
 const sf::Int64 MAX_DELTATIME = 1000000 / MIN_FRAMERATE;
+const sf::Int64 MIN_DELTATIME = 1000000 / MAX_FRAMERATE;
 
 int main(int argc, char** argv)
 {
@@ -14,7 +16,7 @@ int main(int argc, char** argv)
 	sf::Clock clock;
 
 	float fps = 0.0f;
-	sf::Int64 deltaTime;
+	sf::Int64 deltaTime = 0;
 
 	// Text + Rendering
 	sf::Font font;
@@ -43,10 +45,18 @@ int main(int argc, char** argv)
 
 	while (window.isOpen())
 	{
+		// handle time too short (too many frames), last frame was too short, wait a bit
+		// frame limiter
+		if (deltaTime < MIN_DELTATIME)
+		{
+			sf::sleep(sf::microseconds(MIN_DELTATIME - deltaTime));
+		}
 		deltaTime = clock.restart().asMicroseconds();
 		fps = 1000000.0f / static_cast<float>(deltaTime);						// 1 million microseconds per second
+		// handle time too long (low framerate)
 		deltaTime = (deltaTime > MAX_DELTATIME) ? MAX_DELTATIME : deltaTime;	// slow game down so it handles at least 15 frames, no matter what.
 																				// this prevents collission detection failures between frames, etc
+		// display the framerate
 		fpsCounter.setFillColor(fps < 30.0f ? sf::Color::Red : sf::Color::Green);
 		while (window.pollEvent(event))
 		{
