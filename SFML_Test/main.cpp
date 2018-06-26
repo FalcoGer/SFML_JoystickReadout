@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 	joystickButtonNumber.setFont(font);
 	joystickButtonNumber.setFillColor(sf::Color::Black);
 
-	int i = 0;
+	unsigned int i = 0;
 	int col = 0;
 	int row = 0;
 
